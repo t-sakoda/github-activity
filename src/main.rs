@@ -1,5 +1,4 @@
 use clap::Parser;
-use stringcase::pascal_case;
 
 mod handler;
 
@@ -35,166 +34,58 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 println!("{}", handler::commit_comment_event::activity(&event));
             }
             "CreateEvent" => {
-                let repo_name = event["repo"]["name"].as_str().unwrap();
-                let ref_type = event["payload"]["ref_type"].as_str().unwrap();
-                let ref_name = if ref_type == "repository" {
-                    ""
-                } else {
-                    event["payload"]["ref"].as_str().unwrap()
-                };
-                match ref_type {
-                    "repository" => {
-                        println!("- Created {}", repo_name);
-                    }
-                    "branch" => {
-                        println!("- Created branch {} on {}", ref_name, repo_name);
-                    }
-                    "tag" => {
-                        println!("- Created tag {} on {}", ref_name, repo_name);
-                    }
-                    _ => {
-                        println!("- Created {} on {}", ref_name, repo_name);
-                    }
-                }
+                println!("{}", handler::create_event::activity(&event));
             }
             "DeleteEvent" => {
-                let repo_name = event["repo"]["name"].as_str().unwrap();
-                let ref_type = event["payload"]["ref_type"].as_str().unwrap();
-                let ref_name = event["payload"]["ref"].as_str().unwrap();
-                match ref_type {
-                    "branch" => {
-                        println!("- Deleted branch {} from {}", ref_name, repo_name);
-                    }
-                    "tag" => {
-                        println!("- Deleted tag {} from {}", ref_name, repo_name);
-                    }
-                    _ => {
-                        println!("- Deleted {} from {}", ref_name, repo_name);
-                    }
-                }
+                println!("{}", handler::delete_event::activity(&event));
             }
             "ForkEvent" => {
-                let repo_name = event["repo"]["name"].as_str().unwrap();
-                println!("- Forked {}", repo_name);
+                println!("{}", handler::fork_event::activity(&event));
             }
             "GollumEvent" => {
-                let repo_name = event["repo"]["name"].as_str().unwrap();
-                let pages = event["payload"]["pages"].as_array().unwrap();
-                for page in pages {
-                    let action = page["action"].as_str().unwrap();
-                    let page_name = page["page_name"].as_str().unwrap();
-                    println!("- {} {} in {}", pascal_case(action), page_name, repo_name);
-                }
+                println!("{}", handler::gollum_event::activity(&event));
             }
             "IssueCommentEvent" => {
-                let repo_name = event["repo"]["name"].as_str().unwrap();
-                let issue = event["payload"]["issue"]["number"].as_u64().unwrap();
-                let action = event["payload"]["action"].as_str().unwrap();
-                println!(
-                    "- {} issue #{} in {}",
-                    pascal_case(action),
-                    issue,
-                    repo_name
-                );
+                println!("{}", handler::issue_comment_event::activity(&event));
             }
             "IssuesEvent" => {
-                let repo_name = event["repo"]["name"].as_str().unwrap();
-                let issue = event["payload"]["issue"]["number"].as_u64().unwrap();
-                let action = event["payload"]["action"].as_str().unwrap();
-                println!(
-                    "- {} issue #{} in {}",
-                    pascal_case(action),
-                    issue,
-                    repo_name
-                );
+                println!("{}", handler::issue_event::activity(&event));
             }
             "MemberEvent" => {
-                let repo_name = event["repo"]["name"].as_str().unwrap();
-                let member = event["payload"]["member"]["login"].as_str().unwrap();
-                let action = event["payload"]["action"].as_str().unwrap();
-                println!("- {} {} to {}", pascal_case(action), member, repo_name);
+                println!("{}", handler::member_event::activity(&event));
             }
             "PublicEvent" => {
-                let repo_name = event["repo"]["name"].as_str().unwrap();
-                println!("- Made {} public", repo_name);
+                println!("{}", handler::public_event::activity(&event));
             }
             "PullRequestEvent" => {
-                let repo_name = event["repo"]["name"].as_str().unwrap();
-                let pr = event["payload"]["number"].as_u64().unwrap();
-                let action = event["payload"]["action"].as_str().unwrap();
-                match action {
-                    "review_requested" => {
-                        println!("- Review requested pull request #{} in {}", pr, repo_name,);
-                    }
-                    "review_requeste_removed" => {
-                        println!(
-                            "- Review request removed from pull request #{} in {}",
-                            pr, repo_name
-                        );
-                    }
-                    _ => {
-                        println!(
-                            "- {} pull request #{} in {}",
-                            pascal_case(action),
-                            pr,
-                            repo_name
-                        );
-                    }
-                }
+                println!("{}", handler::pull_request_event::activity(&event));
             }
             "PullRequestReviewEvent" => {
-                let repo_name = event["repo"]["name"].as_str().unwrap();
-                let pr = event["payload"]["pull_request"]["number"].as_u64().unwrap();
-                let action = event["payload"]["action"].as_str().unwrap();
-                println!(
-                    "- {} pull request #{} in {}",
-                    pascal_case(action),
-                    pr,
-                    repo_name
-                );
+                println!("{}", handler::pull_request_review_event::activity(&event));
             }
             "PullRequestReviewCommentEvent" => {
-                let repo_name = event["repo"]["name"].as_str().unwrap();
-                let pr = event["payload"]["pull_request"]["number"].as_u64().unwrap();
-                let action = event["payload"]["action"].as_str().unwrap();
                 println!(
-                    "- {} a comment on pull request #{} in {}",
-                    pascal_case(action),
-                    pr,
-                    repo_name
+                    "{}",
+                    handler::pull_request_review_comment_event::activity(&event)
                 );
             }
             "PullRequestReviewThreadEvent" => {
-                let repo_name = event["repo"]["name"].as_str().unwrap();
-                let pr = event["payload"]["pull_request"]["number"].as_u64().unwrap();
-                let action = event["payload"]["action"].as_str().unwrap();
                 println!(
-                    "- {} a comment thread on pull request #{} in {}",
-                    pascal_case(action),
-                    pr,
-                    repo_name
+                    "{}",
+                    handler::pull_request_review_thread_event::activity(&event)
                 );
             }
             "PushEvent" => {
-                let repo_name = event["repo"]["name"].as_str().unwrap();
-                let commit_num = event["payload"]["commits"].as_array().unwrap().len();
-                let commit_plural = if commit_num > 1 { "s" } else { "" };
-                println!(
-                    "- Pushed {} commit{} to {}",
-                    commit_num, commit_plural, repo_name
-                );
+                println!("{}", handler::push_event::activity(&event));
             }
             "ReleaseEvent" => {
-                let repo_name = event["repo"]["name"].as_str().unwrap();
-                let release_name = event["payload"]["release"]["name"].as_str().unwrap();
-                println!("- Released {} in {}", release_name, repo_name);
+                println!("{}", handler::release_event::activity(&event));
             }
             "SponsorshipEvent" => {
                 println!("- Created sponsorship");
             }
             "WatchEvent" => {
-                let repo_name = event["repo"]["name"].as_str().unwrap();
-                println!("- Starred {}", repo_name);
+                println!("{}", handler::watch_event::activity(&event));
             }
             _ => {
                 println!("{}: {}", event_type, event);
