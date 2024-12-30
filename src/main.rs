@@ -14,7 +14,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
 
     let url = format!("https://api.github.com/users/{}/events", args.username);
-    println!("URL: {}", url);
+    dbg!("URL: {}", &url);
 
     let client = reqwest::Client::builder()
         .user_agent(APP_USER_AGENT)
@@ -22,7 +22,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let response = client.get(&url).send().await?;
     let body = response.text().await?;
-    println!("Body: {}", body);
+    dbg!(&body);
+
+    let obj: serde_json::Value = serde_json::from_str(&body)?;
+    dbg!(&obj);
 
     Ok(())
 }
