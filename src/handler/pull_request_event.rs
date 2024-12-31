@@ -25,3 +25,32 @@ pub fn activity(event: &Value) -> std::string::String {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use serde_json::json;
+
+    use crate::handler::pull_request_event::activity;
+
+    #[test]
+    fn it_works() {
+        let event = json!({
+            "type": "PullRequestEvent",
+            "repo": {
+                "name": "octocat/Hello-World"
+            },
+            "payload": {
+                "action": "opened",
+                "number": 1,
+                "pull_request": {
+                    "title": "Update the README with new information"
+                }
+            }
+        });
+
+        assert_eq!(
+            activity(&event),
+            "- Opened pull request #1 in octocat/Hello-World"
+        );
+    }
+}

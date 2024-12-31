@@ -16,3 +16,29 @@ pub fn activity(event: &Value) -> std::string::String {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use serde_json::json;
+
+    use crate::handler::delete_event::activity;
+
+    #[test]
+    fn it_works() {
+        let event = json!({
+            "type": "DeleteEvent",
+            "repo": {
+                "name": "octocat/Hello-World"
+            },
+            "payload": {
+                "ref": "refs/heads/feature",
+                "ref_type": "branch"
+            }
+        });
+
+        assert_eq!(
+            activity(&event),
+            "- Deleted branch refs/heads/feature from octocat/Hello-World"
+        );
+    }
+}

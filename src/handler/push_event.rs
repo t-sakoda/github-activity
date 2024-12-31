@@ -9,3 +9,30 @@ pub fn activity(event: &Value) -> std::string::String {
         commit_num, commit_plural, repo_name
     );
 }
+
+#[cfg(test)]
+mod tests {
+    use serde_json::json;
+
+    use crate::handler::push_event::activity;
+
+    #[test]
+    fn it_works() {
+        let event = json!({
+            "type": "PushEvent",
+            "repo": {
+                "name": "octocat/Hello-World"
+            },
+            "payload": {
+                "commits": [
+                    {
+                        "message": "Update the README",
+                        "sha": "abc123"
+                    }
+                ]
+            }
+        });
+
+        assert_eq!(activity(&event), "- Pushed 1 commit to octocat/Hello-World");
+    }
+}

@@ -16,3 +16,31 @@ pub fn activity(event: &Value) -> std::string::String {
 
     return activities.join("\n");
 }
+
+#[cfg(test)]
+mod tests {
+    use serde_json::json;
+
+    use crate::handler::gollum_event::activity;
+
+    #[test]
+    fn it_works() {
+        let event = json!({
+            "type": "GollumEvent",
+            "repo": {
+                "name": "octocat/Hello-World"
+            },
+            "payload": {
+                "pages": [
+                    {
+                        "page_name": "Home",
+                        "action": "created",
+                        "title": "Home"
+                    }
+                ]
+            }
+        });
+
+        assert_eq!(activity(&event), "- Created Home in octocat/Hello-World");
+    }
+}

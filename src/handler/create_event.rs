@@ -23,3 +23,29 @@ pub fn activity(event: &Value) -> std::string::String {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use serde_json::json;
+
+    use crate::handler::create_event::activity;
+
+    #[test]
+    fn it_works() {
+        let event = json!({
+            "type": "CreateEvent",
+            "repo": {
+                "name": "octocat/Hello-World"
+            },
+            "payload": {
+                "ref": "refs/heads/feature",
+                "ref_type": "branch"
+            }
+        });
+
+        assert_eq!(
+            activity(&event),
+            "- Created branch refs/heads/feature on octocat/Hello-World"
+        );
+    }
+}

@@ -12,3 +12,34 @@ pub fn activity(event: &Value) -> std::string::String {
         repo_name
     );
 }
+
+#[cfg(test)]
+mod tests {
+    use serde_json::json;
+
+    use crate::handler::pull_request_review_thread_event::activity;
+
+    #[test]
+    fn it_works() {
+        let event = json!({
+            "type": "PullRequestReviewThreadEvent",
+            "repo": {
+                "name": "octocat/Hello-World"
+            },
+            "payload": {
+                "action": "resolved",
+                "pull_request": {
+                    "number": 1347
+                },
+                "thread": {
+                    "id": 1
+                }
+            }
+        });
+
+        assert_eq!(
+            activity(&event),
+            "- Resolved a comment thread on pull request #1347 in octocat/Hello-World"
+        );
+    }
+}

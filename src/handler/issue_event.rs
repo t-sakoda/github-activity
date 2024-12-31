@@ -14,3 +14,32 @@ pub fn activity(event: &Value) -> std::string::String {
         repo_name
     );
 }
+
+#[cfg(test)]
+mod tests {
+    use serde_json::json;
+
+    use crate::handler::issue_event::activity;
+
+    #[test]
+    fn it_works() {
+        let event = json!({
+            "type": "IssuesEvent",
+            "repo": {
+                "name": "octocat/Hello-World"
+            },
+            "payload": {
+                "action": "opened",
+                "issue": {
+                    "number": 1347,
+                    "title": "Found a bug"
+                }
+            }
+        });
+
+        assert_eq!(
+            activity(&event),
+            "- Opened issue #1347: Found a bug in octocat/Hello-World"
+        );
+    }
+}
