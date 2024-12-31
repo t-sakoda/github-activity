@@ -22,6 +22,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .build()?;
 
     let response = client.get(&url).send().await?;
+    if !response.status().is_success() {
+        eprintln!("Error: Received response status: {}", response.status());
+        return Ok(());
+    }
     let body = response.text().await?;
 
     let events: serde_json::Value = serde_json::from_str(&body)?;
